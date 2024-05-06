@@ -1,4 +1,4 @@
-const { Player, stringToDataUrl } = TextAliveApp;
+import { Player, stringToDataUrl } from "textalive-app-api";
 
 // TextAlive Player を初期化
 const player = new Player({
