@@ -1,13 +1,23 @@
-console.log("START");
-
-import { Player, stringToDataUrl } from "textalive-app-api";
+/**
+ * TextAlive App API lyric sheet example
+ * https://github.com/TextAliveJp/textalive-app-lyric-sheet
+ *
+ * インタラクティブな歌詞カードを実装した TextAlive App API のサンプルコードです。
+ * 発声にあわせて歌詞が表示され、歌詞をクリックするとそのタイミングに再生がシークします。
+ * また、このアプリが TextAlive ホストと接続されていなければ再生コントロールを表示します。
+ */
+const { Player } = TextAliveApp;
 
 // TextAlive Player を初期化
 const player = new Player({
   // トークンは https://developer.textalive.jp/profile で取得したものを使う
-  app: { token: "u7zIHFLq1kC8mkOY" },
+  app: { token: "JY0mLoHiX3lPTJaS", parameters: [
+    {title: "Gradation start color", name: "gradationStartColor", className: "Color", initialValue: "#63d0e2" },
+    {title: "Gradation end color", name: "gradationEndColor", className: "Color", initialValue: "#ff9438" },
+  ] },
+
   mediaElement: document.querySelector("#media"),
-  mediaBannerPosition: "bottom right"
+  mediaBannerPosition: "bottom right",
 
   // オプション一覧
   // https://developer.textalive.jp/packages/textalive-app-api/interfaces/playeroptions.html
@@ -29,19 +39,26 @@ player.addListener({
     if (!app.songUrl) {
       document.querySelector("#media").className = "disabled";
 
-      // SUPERHERO / めろくる
-      player.createFromSongUrl("https://piapro.jp/t/hZ35/20240130103028", {
+      player.createFromSongUrl("https://piapro.jp/t/FDb1/20210213190029", {
         video: {
-          // 音楽地図訂正履歴
-          beatId: 4592293,
-          chordId: 2727635,
-          repetitiveSegmentId: 2824326,
-          // 歌詞タイミング訂正履歴: https://textalive.jp/lyrics/piapro.jp%2Ft%2FhZ35%2F20240130103028
-          lyricId: 59415,
-          lyricDiffId: 13962
-        }
+          // 音楽地図訂正履歴: https://songle.jp/songs/2121525/history
+          beatId: 3953882,
+          repetitiveSegmentId: 2099561,
+          // 歌詞タイミング訂正履歴: https://textalive.jp/lyrics/piapro.jp%2Ft%2FFDb1%2F20210213190029
+          lyricId: 52065,
+          lyricDiffId: 5093,
+        },
       });
     }
+  },
+
+  /* パラメタが更新されたら呼ばれる */
+  onAppParameterUpdate: () => {
+    const params = player.app.options.parameters;
+    const sc = player.app.parameters.gradationStartColor, scString = sc ? `rgb(${sc.r}, ${sc.g}, ${sc.b})` : params[0].initialValue;
+    const ec = player.app.parameters.gradationEndColor, ecString = ec ? `rgb(${ec.r}, ${ec.g}, ${ec.b})` : params[1].initialValue;
+    document.body.style.backgroundColor = ecString;
+    document.body.style.backgroundImage = `linear-gradient(0deg, ${ecString} 0%, ${scString} 100%)`;
   },
 
   /* 楽曲が変わったら呼ばれる */
@@ -125,7 +142,7 @@ player.addListener({
     const a = document.querySelector("#control > a#play");
     while (a.firstChild) a.removeChild(a.firstChild);
     a.appendChild(document.createTextNode("\uf144"));
-  }
+  },
 });
 
 /* 再生・一時停止ボタン */
