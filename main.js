@@ -1,3 +1,5 @@
+console.log("START");
+
 import { Player, stringToDataUrl } from "textalive-app-api";
 
 // TextAlive Player を初期化
